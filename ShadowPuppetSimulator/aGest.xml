@@ -1,0 +1,39 @@
+import cv2
+
+# Load the custom Haar cascade for hand detection
+hand_cascade = cv2.CascadeClassifier('aGest.xml')
+
+# Open the webcam
+cap = cv2.VideoCapture(0)  # 0 for the default camera
+
+if not cap.isOpened():
+    print("Error: Could not open webcam.")
+    exit()
+
+while True:
+    # Capture a frame from the webcam
+    ret, frame = cap.read()
+    if not ret:
+        print("Error: Failed to capture frame.")
+        break
+
+    # Convert the frame to grayscale (required for detection)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Detect hands using the loaded cascade
+    hands = hand_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+    # Draw rectangles around detected hands
+    for (x, y, w, h) in hands:
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+    # Display the video feed with detections
+    cv2.imshow('Hand Detection', frame)
+
+    # Exit when 'ESC' key is pressed
+    if cv2.waitKey(1) & 0xFF == 27:  # ESC key
+        break
+
+# Release resources and close all windows
+cap.release()
+cv2.destroyAllWindows()
